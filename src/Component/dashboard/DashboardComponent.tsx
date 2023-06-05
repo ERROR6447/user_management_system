@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip } from 'recharts'
 import Coursedetails from '../../Component/Course/Coursedetails'
 import './DashboardComponent.css'
@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useFormik } from 'formik'
 import { type RootState } from '../../store/Store'
 import { addCourse } from '../../slice/CourseSlice'
+import { addCourses, getAllCourses } from '../../api/courses'
 
 export interface Course {
   title: string
@@ -22,6 +23,7 @@ const DashboardComponent: React.FC = () => {
 
   const courses = useSelector((state: RootState) => state.course.courses)
 
+  const [fetchedCourse, setFetchedCourse] = useState([])
   const studentData = [{ label: 'Total Students', data: 100 }]
 
   const courseData = [{ label: 'Total Courses', data: 20 }]
@@ -49,6 +51,17 @@ const DashboardComponent: React.FC = () => {
         title: values.title,
         description: values.description
       }
+
+      addCourses(newCourse).then(async (resp: any) => {
+        if (resp.status !== 200) {
+          console.log('Error While Adding Course:', resp)
+          return
+        }
+        console.log('Course Created:', resp)
+      }).catch(err => {
+        console.log('Error While Creating Course: ', err)
+      })
+
       dispatch(addCourse(newCourse))
       formik.resetForm()
     }
@@ -62,6 +75,26 @@ const DashboardComponent: React.FC = () => {
     setShowDetails(false)
     setSelectedCourse(null)
   }
+
+  const fetchCourses = async () => {
+    try {
+      const resp: any = await getAllCourses()
+      if (resp.status !== 200) {
+        console.log('Error While Fetching Course: ', resp)
+        return
+      }
+      console.log('Courses:', resp.data.courses)
+      setFetchedCourse(resp.data.courses)
+    } catch (err) {
+      console.log('Error While Fetching Course: ', err)
+    }
+  }
+
+  useEffect(() => {
+    fetchCourses().catch(err => {
+      console.log('Error', err)
+    })
+  }, [])
 
   return (
     <>
@@ -142,7 +175,7 @@ const DashboardComponent: React.FC = () => {
               <div className="text-center">
                 <h2 className="fw-bold">Courses</h2>
               </div>
-              {courses.map((course, index) => (
+              {fetchedCourse.map((course: any, index) => (
                 <div className="col-md-4 mt-3" key={index}>
                   <div className="card mt-3">
                     <div className="card-header text-center">{course.title}</div>

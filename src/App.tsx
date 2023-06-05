@@ -10,7 +10,7 @@ import {
 import './App.css'
 
 function App () {
-  const [isAdmin, setIsAdmin] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(true)
   return (
     <BrowserRouter>
       <div className="App">

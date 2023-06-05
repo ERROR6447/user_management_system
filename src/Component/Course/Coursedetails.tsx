@@ -1,9 +1,11 @@
-import React, { useState, useRef } from 'react'
+/* eslint-disable @typescript-eslint/no-confusing-void-expression */
+import React, { useState, useRef, useEffect } from 'react'
 import { type Course } from '../dashboard/DashboardComponent'
 import './Coursedetails.css'
 import { Card, Button } from 'react-bootstrap'
 import { BsPencil, BsTrash } from 'react-icons/bs'
 import { useSelector } from 'react-redux'
+import { getChapterForCourse } from '../../api/chapter'
 
 interface SubCategory {
   id: number
@@ -13,7 +15,7 @@ interface SubCategory {
   image: File | null
 }
 
-const Coursedetails: React.FC<{ course: Course, goBack: () => void }> = ({ course, goBack }) => {
+const Coursedetails: React.FC<{ course: any, goBack: () => void }> = ({ course, goBack }) => {
   const [subCategories, setSubCategories] = useState<SubCategory[]>([])
   const [subCategoryTitle, setSubCategoryTitle] = useState('')
   const [subCategoryDescription, setSubCategoryDescription] = useState('')
@@ -21,6 +23,27 @@ const Coursedetails: React.FC<{ course: Course, goBack: () => void }> = ({ cours
   const [imageFile, setImageFile] = useState<File | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [editIndex, setEditIndex] = useState<number | null>(null)
+
+  const getChapterForCourse = async () => {
+    try {
+      // const resp: any = await getChapterForCourse(course._id)
+      const resp: any = {}
+      console.log('Something:', course)
+      if (resp.status !== 200) {
+        console.log('Error While Fetching Chapter for Course: ', resp)
+        return
+      }
+      console.log('Chapters:', resp.data.chapters)
+      // setFetchedCourse(resp.data.chapters)
+    } catch (err) {
+      console.log('Error While Fetching Course: ', err)
+    }
+  }
+  useEffect(() => {
+    getChapterForCourse().catch(err => [
+      console.log('Error WHile Fetching Chapters: ', err)
+    ])
+  }, [])
 
   const addSubCategory = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()

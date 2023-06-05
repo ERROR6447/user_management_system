@@ -1,6 +1,6 @@
 import axiosInstance from '../config/axiosInstance'
 
-export const addCourse = async (payload: any) => (
+export const addCourses = async (payload: any) => (
   await axiosInstance('/addCourse', {
     method: 'POST',
     data: payload
@@ -34,8 +34,8 @@ export const getAllCourses = async () => (
   })
 )
 
-export const getCourses = async (studentId: string) => (
-  await axiosInstance(`/getCourses/${studentId}`, {
+export const getCourses = async () => (
+  await axiosInstance('/getCourses', {
     method: 'GET'
   }).then((resp) => resp).catch((err) => {
     console.log(err)

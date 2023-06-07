@@ -5,9 +5,10 @@ import './Coursedetails.css'
 import { Card, Button } from 'react-bootstrap'
 import { BsPencil, BsTrash } from 'react-icons/bs'
 import { useSelector } from 'react-redux'
-import { getChapterForCourse } from '../../api/chapter'
+import { addChapters, deleteChapter, getChapterForCourse, updateChapters } from '../../api/chapter'
 
 interface SubCategory {
+  _id: string
   id: number
   title: string
   description: string
@@ -20,27 +21,43 @@ const Coursedetails: React.FC<{ course: any, goBack: () => void }> = ({ course, 
   const [subCategoryTitle, setSubCategoryTitle] = useState('')
   const [subCategoryDescription, setSubCategoryDescription] = useState('')
   const [subCategoryPractical, setSubCategoryPractical] = useState('')
+  const [chapterId, setchapterId] = useState('')
   const [imageFile, setImageFile] = useState<File | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [editIndex, setEditIndex] = useState<number | null>(null)
 
-  const getChapterForCourse = async () => {
+  // const getChapterForCourse = async () => {
+  //   try {
+  //     // const resp: any = await getChapterForCourse(course._id)
+  //     const resp: any = {}
+  //     console.log('Something:', course)
+  //     if (resp.status !== 200) {
+  //       console.log('Error While Fetching Chapter for Course: ', resp)
+  //       return
+  //     }
+  //     console.log('Chapters:', resp.data.chapters)
+  //     // setFetchedCourse(resp.data.chapters)
+  //   } catch (err) {
+  //     console.log('Error While Fetching Course: ', err)
+  //   }
+  // }
+
+  const fetchChapterForCourses = async () => {
     try {
-      // const resp: any = await getChapterForCourse(course._id)
-      const resp: any = {}
-      console.log('Something:', course)
+      const resp: any = await getChapterForCourse(course._id)
       if (resp.status !== 200) {
-        console.log('Error While Fetching Chapter for Course: ', resp)
+        console.log('Error While Fetching Course: ', resp)
         return
       }
       console.log('Chapters:', resp.data.chapters)
-      // setFetchedCourse(resp.data.chapters)
+      setSubCategories(resp.data.chapters)
     } catch (err) {
       console.log('Error While Fetching Course: ', err)
     }
   }
+
   useEffect(() => {
-    getChapterForCourse().catch(err => [
+    fetchChapterForCourses().catch(err => [
       console.log('Error WHile Fetching Chapters: ', err)
     ])
   }, [])
@@ -49,26 +66,66 @@ const Coursedetails: React.FC<{ course: any, goBack: () => void }> = ({ course, 
     e.preventDefault()
 
     if (editIndex !== null) {
-      const updatedSubCategories = [...subCategories]
-      const updatedSubCategory = {
-        id: updatedSubCategories[editIndex].id,
+      // const updatedSubCategories = [...subCategories]
+      // const updatedSubCategory = {
+      //   _id:courseId
+      //   id: updatedSubCategories[editIndex].id,
+      //   title: subCategoryTitle,
+      //   description: subCategoryDescription,
+      //   practical: subCategoryPractical,
+      //   image: imageFile
+      // }
+      // updatedSubCategories[editIndex] = updatedSubCategory
+      // setSubCategories(updatedSubCategories)
+
+      const chapter = {
         title: subCategoryTitle,
         description: subCategoryDescription,
         practical: subCategoryPractical,
         image: imageFile
       }
-      updatedSubCategories[editIndex] = updatedSubCategory
-      setSubCategories(updatedSubCategories)
+
+      console.log('ChapterId: ', chapterId)
+
+      updateChapters(chapterId, chapter).then(async (resp: any) => {
+        if (resp.status !== 200) {
+          console.log('Error While updating Chapter:', resp)
+          return
+        }
+        console.log('Chapter updated For Course:', resp)
+      }).catch(err => {
+        console.log('Error While updating Chapter: ', err)
+      })
+
       setEditIndex(null)
     } else {
-      const newSubCategory: SubCategory = {
-        id: Date.now(),
+      // const newSubCategory: SubCategory = {
+      //   _id: null,
+      //   id: Date.now(),
+      //   title: subCategoryTitle,
+      //   description: subCategoryDescription,
+      //   practical: subCategoryPractical,
+      //   image: imageFile
+      // }
+
+      // setSubCategories([...subCategories, newSubCategory])
+
+      const chapter = {
         title: subCategoryTitle,
         description: subCategoryDescription,
         practical: subCategoryPractical,
         image: imageFile
       }
-      setSubCategories([...subCategories, newSubCategory])
+
+      addChapters(course._id, chapter).then(async (resp: any) => {
+        if (resp.status !== 200) {
+          console.log('Error While Adding Chapter:', resp)
+          return
+        }
+        console.log('Chapter Added For Course:', resp)
+      }).catch(err => {
+        console.log('Error While Adding Chapter: ', err)
+      })
     }
 
     setSubCategoryTitle('')
@@ -78,21 +135,42 @@ const Coursedetails: React.FC<{ course: any, goBack: () => void }> = ({ course, 
     if (fileInputRef.current != null) {
       fileInputRef.current.value = ''
     }
+
+    fetchChapterForCourses().catch(err => [
+      console.log('Error WHile Fetching Chapters: ', err)
+    ])
   }
 
-  const handleEdit = (index: number) => {
+  const handleEdit = (index: number, cchapterId: string) => {
     const subCategoryToEdit = subCategories[index]
     setSubCategoryTitle(subCategoryToEdit.title)
     setSubCategoryDescription(subCategoryToEdit.description)
     setSubCategoryPractical(subCategoryToEdit.practical)
     setImageFile(subCategoryToEdit.image)
+    setchapterId(cchapterId)
     setEditIndex(index)
+    console.log('Passed: ', cchapterId)
+    console.log('ChapterId: ', chapterId)
   }
 
-  const handleDelete = (index: number) => {
-    const updatedSubCategories = subCategories.filter((_, i) => i !== index)
-    setSubCategories(updatedSubCategories)
+  const handleDelete = (index: number, chapterId: string) => {
+    // const updatedSubCategories = subCategories.filter((_, i) => i !== index)
+    // setSubCategories(updatedSubCategories)
+    deleteChapter(chapterId).then(async (resp: any) => {
+      if (resp.status !== 200) {
+        console.log('Error While deleting Chapter:', resp)
+        return
+      }
+      console.log('Chapter deleted For Course:', resp)
+    }).catch(err => {
+      console.log('Error While deleting Chapter: ', err)
+    })
+
     setEditIndex(null)
+
+    fetchChapterForCourses().catch(err => [
+      console.log('Error WHile Fetching Chapters: ', err)
+    ])
   }
 
   return (
@@ -153,10 +231,10 @@ const Coursedetails: React.FC<{ course: any, goBack: () => void }> = ({ course, 
             <div className='d-flex justify-content-between'>
                 <Card.Title className='title'>{subCategory.title}</Card.Title>
                 <div className="card-header-icons">
-                    <Button variant="link" onClick={() => { handleEdit(index) }}>
+                    <Button variant="link" onClick={() => { handleEdit(index, subCategory._id) }}>
                       <BsPencil />
                     </Button>
-                    <Button variant="link" onClick={() => { handleDelete(index) }}>
+                    <Button variant="link" onClick={() => { handleDelete(index, subCategory._id) }}>
                       <BsTrash />
                     </Button>
                   </div>

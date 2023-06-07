@@ -1,15 +1,26 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/strict-boolean-expressions */
+/* eslint-disable @typescript-eslint/prefer-optional-chain */
 import React, { useState, useEffect, useRef } from 'react'
 import { Modal, Button } from 'react-bootstrap'
 import { BsPencil, BsTrash } from 'react-icons/bs'
 import { useSelector } from 'react-redux'
 import { type RootState } from '../../store/Store' // Replace 'path/to/redux/store' with the actual path to your store configuration file
 import './User.css'
+import { getAllCourses, enrollmultiplecourses, removeEnrollment } from '../../api/courses'
+import { getAllUsers } from '../../api/users'
 
 interface Student {
   id: number
   name: string
   stack: string
-  courses: string[]
+  courseslist: string[]
+  coursetitles: any[]
+  email: string
+  user_role: string
+  username: string
+  _id: string
+  courses: any[]
 }
 
 const UserComponent: React.FC = () => {
@@ -17,29 +28,64 @@ const UserComponent: React.FC = () => {
     state.course.courses.map((course) => course.title)
   )
 
-  const [students, setStudents] = useState<Student[]>([])
+  const [students, setStudents] = useState<any[]>([])
   const [courses, setCourses] = useState<string[]>([]) // Added state for courses
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [newStudent, setNewStudent] = useState<Student>({
+  const [newStudent, setNewStudent] = useState<any>({
     id: 0,
     name: '',
     stack: '',
+    courseslist: [],
+    coursetitles: [],
+    email: '',
+    user_role: 'student',
+    username: '',
+    _id: '',
     courses: []
   })
-  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null)
+  // const [selectedStudent, setSelectedStudent] = useState<Student | null>(null)
+  const [selectedStudent, setSelectedStudent] = useState<any>(null)
+
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const tableRef = useRef<HTMLTableElement>(null)
+
+  const fetchAllUsers = async () => {
+    getAllUsers().then(async (resp: any) => {
+      if (resp.status !== 200) {
+        console.log('Error While Fetching  All Users:', resp)
+        return
+      }
+      // setCourses(resp.data.courses)
+      console.log('All Users:', resp.data.users)
+      setStudents(resp.data.users)
+    }).catch(err => {
+      console.log('Error While Fetching  All Users: ', err)
+    })
+  }
 
   useEffect(() => {
     // Fetch students from API or any data source
     // Initially, the students list will be empty
-    setStudents([])
+    fetchAllUsers().catch(err => {
+      console.log('Error', err)
+    })
+    // setStudents([])
   }, [])
 
   useEffect(() => {
     // Fetch courses from API or any data source
     // Initially, the courses list will be empty
-    setCourses([])
+    getAllCourses().then(async (resp: any) => {
+      if (resp.status !== 200) {
+        console.log('Error While Fetching  All Courses:', resp)
+        return
+      }
+      setCourses(resp.data.courses)
+      console.log('All Courses:', resp.data.courses)
+    }).catch(err => {
+      console.log('Error While Fetching ALl courses: ', err)
+    })
+    // setCourses([])
   }, [])
 
   const handleModalOpen = () => {
@@ -61,11 +107,40 @@ const UserComponent: React.FC = () => {
   }
 
   const handleSaveStudent = () => {
-    const id = Math.floor(Math.random() * 9000) + 1000 // Generate random 4-digit ID
-    const updatedNewStudent = { ...newStudent, id }
-    const updatedStudents = [...students, updatedNewStudent]
-    setStudents(updatedStudents)
-    setNewStudent({ id: 0, name: '', stack: '', courses: [] })
+    console.log('enroll_student: ', newStudent)
+    // const id = Math.floor(Math.random() * 9000) + 1000 // Generate random 4-digit ID
+    // const updatedNewStudent = { ...newStudent, id }
+    // const updatedStudents = [...students, updatedNewStudent]
+
+    enrollmultiplecourses({ studentEmail: newStudent.email, stack: newStudent.stack, courseList: newStudent.courseslist }).then(async (resp: any) => {
+      if (resp.status !== 200) {
+        console.log('Error While Adding Student:', resp)
+        return
+      }
+      // setCourses(resp.data.courses)
+      console.log('All Students Added Result:', resp.data.users)
+      // setStudents(resp.data.users)
+    }).catch(err => {
+      console.log('Error While Adding Students: ', err)
+    })
+
+    //  setStudents(updatedStudents)
+    setNewStudent({
+      id: 0,
+      name: '',
+      stack: '',
+      courseslist: [],
+      coursetitles: [],
+      email: '',
+      user_role: 'student',
+      username: '',
+      _id: '',
+      courses: []
+    })
+
+    fetchAllUsers().catch(err => {
+      console.log('Error', err)
+    })
     setIsModalOpen(false)
     scrollToLatestStudent()
   }
@@ -75,9 +150,9 @@ const UserComponent: React.FC = () => {
       if (student.id === selectedStudent?.id) {
         return {
           ...student,
-          name: selectedStudent.name,
-          stack: selectedStudent.stack,
-          courses: selectedStudent.courses
+          name: selectedStudent?.name,
+          stack: selectedStudent?.stack,
+          courses: selectedStudent?.courses
         }
       }
       return student
@@ -87,51 +162,88 @@ const UserComponent: React.FC = () => {
     setIsEditModalOpen(false)
   }
 
-  const handleDeleteStudent = (id: number) => {
-    const updatedStudents = students.filter((student) => student.id !== id)
-    setStudents(updatedStudents)
+  const handleDeleteStudent = (studentId: string, courseId: string) => {
+    // const updatedStudents = students.filter((student) => student.id !== id)
+    // setStudents(updatedStudents)
+
+    removeEnrollment({ studentId, courseId }).then(async (resp: any) => {
+      if (resp.status !== 200) {
+        console.log('Error While Deleting Student Enrollment:', resp)
+        return
+      }
+
+      // setCourses(resp.data.courses)
+
+      console.log('Student Enrollment Deleted:', resp.data)
+      fetchAllUsers().catch(err => {
+        console.log('Error', err)
+      })
+      // setStudents(resp.data.users)
+    }).catch(err => {
+      console.log('Error While Deleting Students Enrollment: ', err)
+    })
+
+    // fetchAllUsers().catch(err => {
+    //   console.log('Error', err)
+    // })
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
-    if (name === 'courses') {
-      const courses = value.split(',').map((course) => course.trim())
-      setNewStudent((prevStudent) => ({ ...prevStudent, [name]: courses }))
+    if (name === 'courseslist') {
+      const courseslist = value.split(',').map((course) => course.trim())
+      setNewStudent((prevStudent: any) => ({ ...prevStudent, [name]: courseslist }))
     } else {
-      setNewStudent((prevStudent) => ({ ...prevStudent, [name]: value }))
+      setNewStudent((prevStudent: any) => ({ ...prevStudent, [name]: value }))
     }
   }
 
   const handleEditInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
-    if (name === 'courses') {
-      const courses = value.split(',').map((course) => course.trim())
-      setSelectedStudent((prevStudent) =>
-        prevStudent != null ? { ...prevStudent, [name]: courses } : null
+    if (name === 'courseslist') {
+      const courseslist = value.split(',').map((course) => course.trim())
+      setSelectedStudent((prevStudent: any) =>
+        prevStudent != null ? { ...prevStudent, [name]: courseslist } : null
       )
     } else {
-      setSelectedStudent((prevStudent) =>
+      setSelectedStudent((prevStudent: any) =>
         prevStudent != null ? { ...prevStudent, [name]: value } : null
       )
     }
   }
   const handleCourseSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    // console.log('E.target: ', e.target.value, e.target.title)
     const { value } = e.target
-    setNewStudent((prevStudent) => ({
+
+    if (newStudent.courses.includes(value)) {
+      alert('Course is already selected')
+      return
+    }
+    setNewStudent((prevStudent: { courseslist: any }) => ({
       ...prevStudent,
-      courses: [...prevStudent.courses, value]
+      courseslist: [...prevStudent.courseslist, value]
     }))
+
+    // const selcourse: any = courses.filter((course: any) => course._id === value)
+    // console.log('Already Presetn: ', newStudent.coursetitles)
+    // console.log('sel Course: ', selcourse[0]?.title)
+
+    // setNewStudent((prevStudent) => ({
+    //   ...prevStudent,
+    //   coursetitles: [...prevStudent.coursetitles, selcourse[0]?.title]
+    // }))
+    // console.log('Title: ', newStudent.coursetitles)
   }
 
   const handleEditCourseSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = e.target
-    setSelectedStudent((prevStudent) => {
-      if (prevStudent != null) {
-        const updatedCourses = [...prevStudent.courses, value]
-        return { ...prevStudent, courses: updatedCourses }
-      }
-      return null
-    })
+    // setSelectedStudent((prevStudent: { courses: any }) => {
+    //   if (prevStudent != null) {
+    //     const updatedCourses = [...prevStudent.courseslist, value]
+    //     return { ...prevStudent, courseslist: updatedCourses }
+    //   }
+    //   return null
+    // })
   }
 
   // const handleEditDeleteCourse = (course: string) => {
@@ -158,35 +270,38 @@ const UserComponent: React.FC = () => {
         <table ref={tableRef}>
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Name</th>
+              <th>user name</th>
+              <th>email</th>
               <th>Stack</th>
               <th>Courses</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {students.map((student) => (
-              <tr key={student.id}>
-                <td>{student.id}</td>
-                <td>{student.name}</td>
-                <td>{student.stack}</td>
-                <td>{student.courses.join(', ')}</td>
+            {students && students.map((student) => (
+              student.enrolled_courses?.map((course: any) => (
+                <tr key={`${student._id}-${course._id}`}>
+                <td>{student.username}</td>
+                <td>{student.email}</td>
+                <td>{student.stack === null ? 'No Stack' : student.stack }</td>
+                <td>{course.title}</td>
                 <td>
                   <BsPencil
                     className="m-2"
                     onClick={() => {
+                      console.log('Selected Student: ', student)
                       handleEditModalOpen(student)
                     }}
                   />
                   <BsTrash
                     className="m-2"
                     onClick={() => {
-                      handleDeleteStudent(student.id)
+                      handleDeleteStudent(student._id, course._id)
                     }}
                   />
                 </td>
               </tr>
+              ))
             ))}
           </tbody>
         </table>
@@ -198,12 +313,12 @@ const UserComponent: React.FC = () => {
         </Modal.Header>
         <Modal.Body>
           <div>
-            <label htmlFor="name">Name:</label>
+            <label htmlFor="email">Email:</label>
             <input
               type="text"
-              id="name"
-              name="name"
-              value={newStudent.name}
+              id="email"
+              name="email"
+              value={newStudent.email}
               onChange={handleInputChange}
             />
           </div>
@@ -218,13 +333,18 @@ const UserComponent: React.FC = () => {
             />
           </div>
           <div>
-            <label htmlFor="courses">Courses:</label>
+            <label htmlFor="courseslist">Courses:</label>
             <input
               type="text"
-              id="courses"
-              name="courses"
-              value={newStudent.courses.join(', ')}
+              id="courseslist"
+              name="courseslist"
+              value={newStudent.courseslist.map((course: any) => {
+                const selcourse: any = courses.filter((c: any) => c._id === course)
+                console.log('selected:', selcourse)
+                return selcourse[0]?.title
+              }).join(', ')}
               onChange={handleInputChange}
+              readOnly
             />
           </div>
           <div>
@@ -232,9 +352,9 @@ const UserComponent: React.FC = () => {
 
             <select id="select-course" onChange={handleCourseSelect}>
               <option value="">-- Select Course --</option>
-              {courseTitles.map((title: any) => (
-                <option key={title} value={title}>
-                  {title}
+              {courses && courses.map((course: any) => (
+                <option key={course._id} value={course._id}>
+                  {course.title}
                 </option>
               ))}
             </select>
@@ -256,12 +376,12 @@ const UserComponent: React.FC = () => {
         </Modal.Header>
         <Modal.Body>
           <div>
-            <label htmlFor="name">Name:</label>
+            <label htmlFor="email">email:</label>
             <input
               type="text"
-              id="name"
-              name="name"
-              value={selectedStudent?.name ?? ''}
+              id="email"
+              name="email"
+              value={selectedStudent?.email ?? ''}
               onChange={handleEditInputChange}
             />
           </div>
@@ -282,17 +402,25 @@ const UserComponent: React.FC = () => {
               type="text"
               id="courses"
               name="courses"
-              value={selectedStudent?.courses.join(', ')}
               onChange={handleEditInputChange}
+              value={selectedStudent
+                ? selectedStudent?.enrolled_courses.map((course: any) => {
+                  const selcourse: any = courses.filter((c: any) => c._id === course._id)
+                  console.log('selected:', selcourse)
+                  return selcourse[0]?.title
+                }).join(', ')
+                : ''}
+              readOnly
+
             />
           </div>
           <div>
             <label htmlFor="select-course">Select Course:</label>
             <select id="select-course" onChange={handleEditCourseSelect}>
               <option value="">-- Select Course --</option>
-              {courseTitles.map((title: any) => (
-                <option key={title} value={title}>
-                  {title}
+              {courses && courses.map((course: any) => (
+                <option key={course._id} value={course._id}>
+                  {course.title}
                 </option>
               ))}
             </select>

@@ -3,11 +3,13 @@ import React, { useEffect, useState } from 'react'
 import { Toaster, toast } from 'react-hot-toast'
 import getLoginDetails from '../../../utils/getLoginDetails'
 import { signUp } from '../../../api/users'
+import { useNavigate } from 'react-router-dom'
 
 const Register: React.FC = () => {
   const [name, setName] = useState<string>('')
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
+  const navigator = useNavigate()
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -45,8 +47,10 @@ const Register: React.FC = () => {
     if (decoded) {
       if (decoded.role === 'admin') {
         // navigate to admin dashboard
+        navigator('/Admindashboard')
       } else if (decoded.role === 'student') {
         // navigate to sutdent dasbhoard
+        navigator('/Studentdashboard')
       }
     }
   }, [])

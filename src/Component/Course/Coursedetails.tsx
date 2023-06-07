@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/strict-boolean-expressions */
+/* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable @typescript-eslint/no-confusing-void-expression */
 import React, { useState, useRef, useEffect } from 'react'
 import { type Course } from '../dashboard/DashboardComponent'
@@ -5,7 +7,9 @@ import './Coursedetails.css'
 import { Card, Button } from 'react-bootstrap'
 import { BsPencil, BsTrash } from 'react-icons/bs'
 import { useSelector } from 'react-redux'
+import { useNavigate, useParams } from 'react-router-dom'
 import { addChapters, deleteChapter, getChapterForCourse, updateChapters } from '../../api/chapter'
+import { getCourseById } from '../../api/courses'
 
 interface SubCategory {
   _id: string
@@ -16,7 +20,7 @@ interface SubCategory {
   image: File | null
 }
 
-const Coursedetails: React.FC<{ course: any, goBack: () => void }> = ({ course, goBack }) => {
+const Coursedetails: React.FC = () => {
   const [subCategories, setSubCategories] = useState<SubCategory[]>([])
   const [subCategoryTitle, setSubCategoryTitle] = useState('')
   const [subCategoryDescription, setSubCategoryDescription] = useState('')
@@ -25,6 +29,9 @@ const Coursedetails: React.FC<{ course: any, goBack: () => void }> = ({ course, 
   const [imageFile, setImageFile] = useState<File | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [editIndex, setEditIndex] = useState<number | null>(null)
+  const { courseId } = useParams()
+  const [course, setCourse] = useState<any>({})
+  const navigator = useNavigate()
 
   // const getChapterForCourse = async () => {
   //   try {
@@ -42,9 +49,27 @@ const Coursedetails: React.FC<{ course: any, goBack: () => void }> = ({ course, 
   //   }
   // }
 
-  const fetchChapterForCourses = async () => {
+  const fetchCourse = async () => {
     try {
-      const resp: any = await getChapterForCourse(course._id)
+      const resp: any = await getCourseById(courseId)
+      if (resp.status !== 200) {
+        console.log('Error While Fetching Course: ', resp)
+        return
+      }
+
+      console.log('Course:', resp.data.course)
+      setCourse(resp.data.course)
+      fetchChapterForCourses(resp.data.course._id).catch(err => [
+        console.log('Error WHile Fetching Chapters: ', err)
+      ])
+    } catch (err) {
+      console.log('Error While Fetching Course Details: ', err)
+    }
+  }
+
+  const fetchChapterForCourses = async (courseId: any) => {
+    try {
+      const resp: any = await getChapterForCourse(courseId)
       if (resp.status !== 200) {
         console.log('Error While Fetching Course: ', resp)
         return
@@ -57,9 +82,15 @@ const Coursedetails: React.FC<{ course: any, goBack: () => void }> = ({ course, 
   }
 
   useEffect(() => {
-    fetchChapterForCourses().catch(err => [
-      console.log('Error WHile Fetching Chapters: ', err)
-    ])
+    if (!course._id) {
+      fetchCourse()
+    }
+
+    if (course._id) {
+      fetchChapterForCourses(course._id).catch(err => [
+        console.log('Error WHile Fetching Chapters: ', err)
+      ])
+    }
   }, [])
 
   const addSubCategory = (e: React.FormEvent<HTMLFormElement>) => {
@@ -92,7 +123,7 @@ const Coursedetails: React.FC<{ course: any, goBack: () => void }> = ({ course, 
           console.log('Error While updating Chapter:', resp)
           return
         }
-        fetchChapterForCourses().catch(err => [
+        fetchChapterForCourses(course._id).catch(err => [
           console.log('Error WHile Fetching Chapters: ', err)
         ])
         console.log('Chapter updated For Course:', resp)
@@ -125,7 +156,7 @@ const Coursedetails: React.FC<{ course: any, goBack: () => void }> = ({ course, 
           console.log('Error While Adding Chapter:', resp)
           return
         }
-        fetchChapterForCourses().catch(err => [
+        fetchChapterForCourses(course._id).catch(err => [
           console.log('Error WHile Fetching Chapters: ', err)
         ])
         console.log('Chapter Added For Course:', resp)
@@ -142,7 +173,7 @@ const Coursedetails: React.FC<{ course: any, goBack: () => void }> = ({ course, 
       fileInputRef.current.value = ''
     }
 
-    fetchChapterForCourses().catch(err => [
+    fetchChapterForCourses(course._id).catch(err => [
       console.log('Error WHile Fetching Chapters: ', err)
     ])
   }
@@ -167,7 +198,7 @@ const Coursedetails: React.FC<{ course: any, goBack: () => void }> = ({ course, 
         console.log('Error While deleting Chapter:', resp)
         return
       }
-      fetchChapterForCourses().catch(err => [
+      fetchChapterForCourses(course._id).catch(err => [
         console.log('Error WHile Fetching Chapters: ', err)
       ])
       console.log('Chapter deleted For Course:', resp)
@@ -177,14 +208,16 @@ const Coursedetails: React.FC<{ course: any, goBack: () => void }> = ({ course, 
 
     setEditIndex(null)
 
-    fetchChapterForCourses().catch(err => [
+    fetchChapterForCourses(course._id).catch(err => [
       console.log('Error WHile Fetching Chapters: ', err)
     ])
   }
 
   return (
     <div className="container CourseContainer">
-      <button className="back-btn" onClick={goBack}>
+      <button className="back-btn" onClick={() => {
+        navigator('/Admindashboard')
+      }}>
         &larr; &nbsp;Back
       </button>
 

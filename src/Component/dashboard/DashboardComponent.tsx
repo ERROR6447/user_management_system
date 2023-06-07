@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import React, { useEffect, useState } from 'react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip } from 'recharts'
 import Coursedetails from '../../Component/Course/Coursedetails'
@@ -7,6 +8,7 @@ import { useFormik } from 'formik'
 import { type RootState } from '../../store/Store'
 import { addCourse } from '../../slice/CourseSlice'
 import { addCourses, getAllCourses } from '../../api/courses'
+import { useNavigate } from 'react-router-dom'
 
 export interface Course {
   title: string
@@ -27,7 +29,7 @@ const DashboardComponent: React.FC = () => {
   const studentData = [{ label: 'Total Students', data: 100 }]
 
   const courseData = [{ label: 'Total Courses', data: 20 }]
-
+  const navigator = useNavigate()
   const [showDetails, setShowDetails] = useState(false)
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null)
 
@@ -188,7 +190,8 @@ const DashboardComponent: React.FC = () => {
                         <button
                           className="arrow-button"
                           onClick={() => {
-                            handleArrowClick(course)
+                          //  handleArrowClick(course)
+                            navigator(`/ShowCourseDetails/${course._id}`)
                           }}
                         >
                           &rarr;
@@ -201,7 +204,9 @@ const DashboardComponent: React.FC = () => {
             </div>
           </div>
           )
-        : selectedCourse != null && <Coursedetails course={selectedCourse} goBack={handleGoBack} />}
+        : null
+        // : selectedCourse != null && <Coursedetails course={selectedCourse} goBack={handleGoBack} />}
+                        }
     </>
   )
 }

@@ -52,9 +52,10 @@ const Login: React.FC = () => {
     if (decoded) {
       if (decoded.role === 'student') {
         // navigate to student dashboard
-
+        navigator('/Studentdashboard')
       } else if (decoded.role === 'admin') {
         // navigate to admin dashboard
+        navigator('/Admindashboard')
       }
     }
   }, [])

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Children } from 'react'
 import './Nav.css'
 
 import DashboardComponent from '../dashboard/DashboardComponent'
@@ -6,9 +6,10 @@ import UserComponent from '../UserDetails/UserComponent'
 import UserDetailsComponent from '../UserDetails/UserDetailsComponent'
 
 import StudentCourseComponent from '../Student/StudentCourse'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { setCookie } from 'react-use-cookie'
 
-const Navbar = ({ isAdmin }: any) => {
+const Navbar = ({ isAdmin, children }: any) => {
   // Accept a prop "isAdmin" to determine the user role
   const [isMenuOpen, setMenuOpen] = useState(window.innerWidth >= 700)
   const [isMobile, setIsMobile] = useState(false)
@@ -16,6 +17,7 @@ const Navbar = ({ isAdmin }: any) => {
   const [isUserVisible, setUserVisible] = useState(false)
   const [isUserUpdateVisible, setUserUpdateVisible] = useState(false)
   const [isCourseVisible, setCourseVisible] = useState(false) // Added state for course visibility
+  const navigator = useNavigate()
 
   const toggleMenu = () => {
     setMenuOpen(!isMenuOpen)
@@ -61,6 +63,11 @@ const Navbar = ({ isAdmin }: any) => {
       window.removeEventListener('resize', handleResize)
     }
   }, [])
+
+  function handleSignout (event: any): void {
+    setCookie('token', '', { path: '/' })
+    navigator('/login')
+  }
 
   return (
     <div>
@@ -112,9 +119,12 @@ const Navbar = ({ isAdmin }: any) => {
               <hr className="dropdown-divider" />
             </li>
             <li>
-              <Link className="dropdown-item" to="/">
+              {/* <Link className="dropdown-item" to="/">
                 <i className="fa fa-sign-out" aria-hidden="true"></i> Sign out
-              </Link>
+              </Link> */}
+              <div onClick={handleSignout} >
+                <i className="fa fa-sign-out" aria-hidden="true"></i> Sign out
+              </div>
             </li>
           </ul>
         </div>
@@ -136,18 +146,25 @@ const Navbar = ({ isAdmin }: any) => {
               <hr />
               {isAdmin === true && (
   <>
-    <div
+    <Link
       className="nav__item mt-4"
       role="button"
-      onClick={showDashboard}
+      to="/AdminDashboard"
+      style={{
+        textDecoration: 'none',
+        color: 'white'
+      }}
     >
       <i className="fa fa-home" aria-hidden="true"></i>
       <span>Dashboard</span>
-    </div>
-    <div className="nav__item" role="button" onClick={showUser}>
+    </Link>
+    <Link className="nav__item" role="button" to='/manageEnrollment' style={{
+      textDecoration: 'none',
+      color: 'white'
+    }}>
       <i className="fa fa-users" aria-hidden="true"></i>
       <span>Manage Students</span>
-    </div>
+    </Link>
     <div
       className="nav__item"
       role="button"
@@ -160,10 +177,15 @@ const Navbar = ({ isAdmin }: any) => {
               )}
 
 {isAdmin === false && (
-  <div className="nav__item" role="button" onClick={showCourse}>
+  <Link className="nav__item" role="button" to='/courses'
+  style={{
+    textDecoration: 'none',
+    color: 'white'
+  }}
+  >
     <i className="fa fa-graduation-cap" aria-hidden="true"></i>
     <span>Courses</span>
-  </div>
+  </Link>
 )}
 
 <div className="nav-footer" onClick={toggleMenu}>
@@ -200,10 +222,7 @@ const Navbar = ({ isAdmin }: any) => {
     </p>
           )}
 
-            {isDashboardVisible && <DashboardComponent />}
-            {isUserVisible && <UserComponent />}
-            {isUserUpdateVisible && <UserDetailsComponent />}
-            {isCourseVisible && <StudentCourseComponent />}{' '}
+           {children}
             {/* Render student course component */}
           </div>
         </main>

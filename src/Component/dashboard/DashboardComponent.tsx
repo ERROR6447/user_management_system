@@ -64,6 +64,9 @@ const DashboardComponent: React.FC = () => {
 
       dispatch(addCourse(newCourse))
       formik.resetForm()
+      fetchCourses().catch(err => {
+        console.log('Error', err)
+      })
     }
   })
   const handleArrowClick = (course: Course) => {

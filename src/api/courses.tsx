@@ -18,6 +18,24 @@ export const updateCourse = async (courseId: string, payload: any) => (
   })
 )
 
+export const enrollStudent = async (courseId: string, payload: any) => (
+  await axiosInstance(`/enroll_student/${courseId}`, {
+    method: 'POST',
+    data: payload
+  }).then((resp) => resp).catch((err) => {
+    console.log(err)
+  })
+)
+
+export const enrollmultiplecourses = async (payload: any) => (
+  await axiosInstance('/enroll_multiple_students/', {
+    method: 'POST',
+    data: payload
+  }).then((resp) => resp).catch((err) => {
+    console.log(err)
+  })
+)
+
 export const deleteCourse = async (courseId: string) => (
   await axiosInstance(`/deleteCourse/${courseId}`, {
     method: 'DELETE'
@@ -37,6 +55,15 @@ export const getAllCourses = async () => (
 export const getCourses = async () => (
   await axiosInstance('/getCourses', {
     method: 'GET'
+  }).then((resp) => resp).catch((err) => {
+    console.log(err)
+  })
+)
+
+export const removeEnrollment = async (payload: any) => (
+  await axiosInstance('/removeEnrollment', {
+    method: 'PUT',
+    data: payload
   }).then((resp) => resp).catch((err) => {
     console.log(err)
   })

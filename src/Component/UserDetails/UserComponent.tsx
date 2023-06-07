@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 /* eslint-disable @typescript-eslint/prefer-optional-chain */
@@ -175,14 +176,13 @@ const UserComponent: React.FC = () => {
       // setCourses(resp.data.courses)
 
       console.log('Student Enrollment Deleted:', resp.data)
-      fetchAllUsers().catch(err => {
-        console.log('Error', err)
-      })
+      fetchAllUsers()
       // setStudents(resp.data.users)
     }).catch(err => {
       console.log('Error While Deleting Students Enrollment: ', err)
     })
 
+    fetchAllUsers()
     // fetchAllUsers().catch(err => {
     //   console.log('Error', err)
     // })
@@ -278,8 +278,8 @@ const UserComponent: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {students && students.map((student) => (
-              student.enrolled_courses?.map((course: any) => (
+            {courses && courses.map((course: any) => (
+              course.enrolled_students?.map((student: any) => (
                 <tr key={`${student._id}-${course._id}`}>
                 <td>{student.username}</td>
                 <td>{student.email}</td>

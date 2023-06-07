@@ -37,9 +37,9 @@ const Login: React.FC = () => {
       const user: any = await jwt(resp.data.token)
 
       if (user.role === 'admin') {
-        // navigate to admin dashboard
+        navigator('/Admindashboard')
       } else if (user.role === 'student') {
-        // navigate to student dashboard
+        navigator('/Studentdashboard')
       }
       console.log('Logged In if here')
     }).catch(err => {

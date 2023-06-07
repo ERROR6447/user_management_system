@@ -92,6 +92,9 @@ const Coursedetails: React.FC<{ course: any, goBack: () => void }> = ({ course, 
           console.log('Error While updating Chapter:', resp)
           return
         }
+        fetchChapterForCourses().catch(err => [
+          console.log('Error WHile Fetching Chapters: ', err)
+        ])
         console.log('Chapter updated For Course:', resp)
       }).catch(err => {
         console.log('Error While updating Chapter: ', err)
@@ -122,6 +125,9 @@ const Coursedetails: React.FC<{ course: any, goBack: () => void }> = ({ course, 
           console.log('Error While Adding Chapter:', resp)
           return
         }
+        fetchChapterForCourses().catch(err => [
+          console.log('Error WHile Fetching Chapters: ', err)
+        ])
         console.log('Chapter Added For Course:', resp)
       }).catch(err => {
         console.log('Error While Adding Chapter: ', err)
@@ -161,6 +167,9 @@ const Coursedetails: React.FC<{ course: any, goBack: () => void }> = ({ course, 
         console.log('Error While deleting Chapter:', resp)
         return
       }
+      fetchChapterForCourses().catch(err => [
+        console.log('Error WHile Fetching Chapters: ', err)
+      ])
       console.log('Chapter deleted For Course:', resp)
     }).catch(err => {
       console.log('Error While deleting Chapter: ', err)

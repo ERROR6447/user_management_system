@@ -8,6 +8,7 @@ import {
   Routes
 } from 'react-router-dom'
 import './App.css'
+import EmailVerificationSuccess from './pages/auth/verify_email/EmailVerifyPage'
 
 function App () {
   const [isAdmin, setIsAdmin] = useState(true)
@@ -16,7 +17,15 @@ function App () {
       <div className="App">
         <Routes>
           <Route path="/" element={<Login />} />
-          <Route path="/dashboard" element={<Nav isAdmin={isAdmin} setIsAdmin={setIsAdmin}/>} />
+          <Route
+            path="/Admindashboard"
+            element={<Nav isAdmin={true}/> }
+          />
+          <Route
+            path="/Studentdashboard"
+            element={<Nav isAdmin={false}/> }
+          />
+          <Route path="/email-verified" element={<EmailVerificationSuccess />} />
         </Routes>
       </div>
     </BrowserRouter>

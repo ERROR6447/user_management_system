@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/strict-boolean-expressions */
 import React, { useEffect, useState } from 'react'
-import { Toaster } from 'react-hot-toast'
+import { Toaster, toast } from 'react-hot-toast'
 import getLoginDetails from '../../../utils/getLoginDetails'
 import { signUp } from '../../../api/users'
 
@@ -25,9 +25,13 @@ const Register: React.FC = () => {
       Enable_2FactAuth: false
     }
 
-    signUp(payload).then((response) => {
+    signUp(payload).then((response: any) => {
       // Handle successful signup
+      if (response.status !== 200) {
+        console.log('Error While Signup: ', response)
+      }
       console.log('Signup successful:', response)
+      toast.success(response.data.message)
     })
       .catch((error) => {
       // Handle signup error

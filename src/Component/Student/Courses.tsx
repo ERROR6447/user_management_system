@@ -1,6 +1,11 @@
-import React, { useState } from 'react'
+/* eslint-disable @typescript-eslint/no-floating-promises */
+/* eslint-disable @typescript-eslint/no-confusing-void-expression */
+import React, { useEffect, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
 import './Student.css'
+import { useParams } from 'react-router-dom'
+import { getCourseProgress } from '../../api/courses'
+import { submitChapter } from '../../api/submission'
 
 interface Chapter {
   id: number
@@ -18,12 +23,15 @@ interface CourseDetailsProps {
   onBack: () => void
 }
 
-const CourseDetails: React.FC<CourseDetailsProps> = ({ course, onBack }) => {
+const CourseDetails: React.FC = () => {
   // const [practicalSubmissions, setPracticalSubmissions] = useState<string[]>(
   //   []
   // )
   const [gradesVisible, setGradesVisible] = useState(false)
-
+  const [course, setCourse] = useState<any>({})
+  const [chapters, setChapters] = useState<any>([])
+  const [submission, setSubmission] = useState<any>([])
+  const { courseId } = useParams()
   // const handlePracticalSubmit = (chapterId: number, submission: string) => {
   //   const updatedSubmissions = [...practicalSubmissions]
   //   updatedSubmissions[chapterId - 1] = submission
@@ -36,31 +44,67 @@ const CourseDetails: React.FC<CourseDetailsProps> = ({ course, onBack }) => {
 
   const { getRootProps, getInputProps } = useDropzone()
 
+  const fetchCourseProgress = async () => {
+    try {
+      const resp: any = await getCourseProgress(courseId)
+      if (resp.status !== 200) {
+        console.log('Error While Fetching Course: ', resp)
+        return
+      }
+
+      console.log('Course:', resp.data.course)
+      setCourse(resp.data.course)
+      setChapters(resp.data.chapters)
+      setSubmission(resp.data.submission)
+    } catch (err) {
+      console.log('Error While Fetching Course Details: ', err)
+    }
+  }
+
+  const submitPractical = (chapterId: string) => {
+    submitChapter(chapterId, {}).then((resp: any) => {
+      if (resp.status !== 200) {
+        console.log('Error While Submitting Practical: ', resp)
+        return
+      }
+      console.log('Practical Sumbitted Succesffully', resp)
+    }).catch(err => {
+      console.log('Error While Submitting Practical: ', err)
+    })
+  }
+
+  useEffect(() => {
+    fetchCourseProgress()
+  }, [])
+
   return (
     <div className="container-mained">
       <div className="course-details">
         <h2 className="course-title">{course.title}</h2>
         <p className="course-description">{course.description}</p>
 
-        {course.chapters.map((chapter) => (
-          <div className="chapter" key={chapter.id}>
+        {chapters.map((chapter: any) => (
+          <div className="chapter" key={chapter._id}>
             <h3 className="chapter-title">{chapter.title}</h3>
             <p className="chapter-practical">{chapter.practical}</p>
             <div className="dropzone" {...getRootProps()}>
               <input {...getInputProps()} />
               <p>Drag and drop a file here, or click to select a file </p>
             </div>
+            <button onClick={() => { submitPractical(chapter._id) }}> Submit</button>
           </div>
         ))}
-        <button className="back-button" onClick={onBack}>
+        <button className="back-button"
+        // onClick={onBack}
+        >
           Back
         </button>
 
         <div className={`grade-section ${gradesVisible ? 'show' : ''}`}>
-          {course.chapters.map((chapter) => (
-            <div className="grade-item" key={chapter.id}>
-              <h4 className="grade-title">{chapter.title} Grade:</h4>
-              <p className="grade-value">90%</p>
+          {submission.map((sub: any) => (
+            <div className="grade-item" key={sub.chapter._id}>
+              <h4 className="grade-title">{sub.chapter.title} Grade:</h4>
+              <p className="grade-value">{sub.grade}</p>
             </div>
           ))}
         </div>

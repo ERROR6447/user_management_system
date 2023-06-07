@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import axiosInstance from '../config/axiosInstance'
 
 export const addCourses = async (payload: any) => (
@@ -64,6 +65,22 @@ export const removeEnrollment = async (payload: any) => (
   await axiosInstance('/removeEnrollment', {
     method: 'PUT',
     data: payload
+  }).then((resp) => resp).catch((err) => {
+    console.log(err)
+  })
+)
+
+export const getCourseById = async (payload: any) => (
+  await axiosInstance(`/getCourseById/${payload}`, {
+    method: 'GET'
+  }).then((resp) => resp).catch((err) => {
+    console.log(err)
+  })
+)
+
+export const getCourseProgress = async (payload: any) => (
+  await axiosInstance(`/getCourseProgress/${payload}`, {
+    method: 'GET'
   }).then((resp) => resp).catch((err) => {
     console.log(err)
   })

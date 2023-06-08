@@ -1,6 +1,8 @@
-import React, { useState } from 'react'
+/* eslint-disable @typescript-eslint/no-floating-promises */
+import React, { useEffect, useState } from 'react'
 import { ProgressBar, Form, Table } from 'react-bootstrap'
 import './userDeatils.css'
+import { getAllSubmission2 } from '../../api/submission'
 
 interface User {
   id: number
@@ -80,6 +82,22 @@ const UserDetailsComponent = () => {
       prevGradedUsers.filter((id) => id !== userId)
     ) // Remove user from graded users array if course changes
   }
+
+  const getSubmissions2 = () => {
+    getAllSubmission2().then(async (resp: any) => {
+      if (resp.status !== 200) {
+        console.log('error while feetching submission: ')
+      }
+
+      console.log('Submission Fetched: ', resp.data)
+    }).catch(err => {
+      console.log('Error While Fetching Submissions: ', err)
+    })
+  }
+
+  useEffect(() => {
+    getSubmissions2()
+  }, [])
 
   const handleGradeSubmit = (
     event: React.FormEvent<HTMLFormElement>,

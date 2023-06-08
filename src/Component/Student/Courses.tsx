@@ -23,7 +23,7 @@ interface CourseDetailsProps {
   onBack: () => void
 }
 
-const CourseDetails: React.FC = () => {
+const CourseProgress: React.FC = () => {
   // const [practicalSubmissions, setPracticalSubmissions] = useState<string[]>(
   //   []
   // )
@@ -53,6 +53,8 @@ const CourseDetails: React.FC = () => {
       }
 
       console.log('Course:', resp.data.course)
+      console.log('chapters: ', resp.data.chapters)
+      console.log('Submission: ', resp.data.submission)
       setCourse(resp.data.course)
       setChapters(resp.data.chapters)
       setSubmission(resp.data.submission)
@@ -104,7 +106,7 @@ const CourseDetails: React.FC = () => {
           {submission.map((sub: any) => (
             <div className="grade-item" key={sub.chapter._id}>
               <h4 className="grade-title">{sub.chapter.title} Grade:</h4>
-              <p className="grade-value">{sub.grade}</p>
+              <p className="grade-value">{sub.grade !== undefined ? sub.grade : 'No Grade Yet' }</p>
             </div>
           ))}
         </div>
@@ -117,4 +119,4 @@ const CourseDetails: React.FC = () => {
   )
 }
 
-export default CourseDetails
+export default CourseProgress

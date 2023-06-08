@@ -1,16 +1,24 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-floating-promises */
+/* eslint-disable @typescript-eslint/strict-boolean-expressions */
 import React, { useEffect, useState } from 'react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip } from 'recharts'
 import Coursedetails from '../../Component/Course/Coursedetails'
 import './DashboardComponent.css'
 import { useDispatch, useSelector } from 'react-redux'
 import { useFormik } from 'formik'
-import { RootState } from '../../store/Store'
+import { type RootState } from '../../store/Store'
+import { BsPencil, BsTrash } from 'react-icons/bs'
+
+import { Button } from 'react-bootstrap'
 import { addCourse } from '../../slice/CourseSlice'
-import { addCourses, getAllCourses } from '../../api/courses'
+import { addCourses, getAllCourses, updateCourse } from '../../api/courses'
 import { useNavigate } from 'react-router-dom'
 import { getAllSubmission2 } from '../../api/submission'
+import { toast } from 'react-hot-toast'
 
 export interface Course {
+  _id?: string
   title: string
   description: string
 }
@@ -38,8 +46,8 @@ const DashboardComponent: React.FC = () => {
       title: '',
       description: ''
     },
-    validate: (values: { title: string; description: string }) => {
-      const errors: { title?: string; description?: string } = {}
+    validate: (values: { title: string, description: string }) => {
+      const errors: { title?: string, description?: string } = {}
       if (values.title === '') {
         errors.title = 'Title is required'
       }
@@ -54,19 +62,38 @@ const DashboardComponent: React.FC = () => {
         description: values.description
       }
       setShowDetails(false)
-      addCourses(newCourse)
-        .then(async (resp: any) => {
-          if (resp.status !== 200) {
-            console.log('Error While Adding Course:', resp)
-            return
-          }
-          console.log('Course Created:', resp)
-        })
-        .catch((err) => {
-          console.log('Error While Creating Course: ', err)
-        })
 
-      dispatch(addCourse(newCourse))
+      if (selectedCourse !== null) {
+        updateCourse(selectedCourse._id ?? '', newCourse)
+          .then(async (resp: any) => {
+            if (resp.status !== 200) {
+              console.log('Error While Adding Course:', resp)
+              return
+            }
+            toast.success(resp.data.message)
+            console.log('Course Created:', resp)
+          })
+          .catch((err) => {
+            console.log('Error While Creating Course: ', err)
+          })
+      } else {
+        addCourses(newCourse)
+          .then(async (resp: any) => {
+            if (resp.status !== 200) {
+              console.log('Error While Adding Course:', resp)
+              return
+            }
+            toast.success(resp.data.message)
+
+            console.log('Course Created:', resp)
+          })
+          .catch((err) => {
+            console.log('Error While Creating Course: ', err)
+          })
+
+        dispatch(addCourse(newCourse))
+      }
+
       formik.resetForm()
       fetchCourses().catch((err) => {
         console.log('Error', err)
@@ -76,16 +103,20 @@ const DashboardComponent: React.FC = () => {
 
   const handleArrowClick = (course: Course) => {
     setSelectedCourse(course)
-    
+    formik.setValues({
+      title: course.title,
+      description: course.description
+    })
+    toggleSidebar()
   }
 
   const handleGoBack = () => {
     setShowDetails(false)
     setSelectedCourse(null)
   }
-const handleModal = ()=>{
-  setShowDetails(false)
-}
+  const handleModal = () => {
+    setShowDetails(false)
+  }
   const fetchCourses = async () => {
     try {
       const resp: any = await getAllCourses()
@@ -93,10 +124,6 @@ const handleModal = ()=>{
         console.log('Error While Fetching Course: ', resp)
         return
       }
-
-      const resp2: any = await getAllSubmission2()
-
-      console.log('Test resp2: ', resp2.data)
 
       console.log('Courses:', resp.data.courses)
       setFetchedCourse(resp.data.courses)
@@ -138,7 +165,16 @@ const handleModal = ()=>{
             </BarChart>
           </div>
         </div>
-        <button className="btn btn-primary mt-4" onClick={toggleSidebar}>
+        <button className="btn btn-primary mt-4" onClick={() => {
+          if (!showDetails && selectedCourse !== null) {
+            setSelectedCourse(null)
+            formik.setValues({
+              title: '',
+              description: ''
+            })
+          }
+          toggleSidebar()
+        }}>
           {showDetails ? 'Close' : 'Add Course'}
         </button>
         <div className="row mt-4">
@@ -148,26 +184,40 @@ const handleModal = ()=>{
           {fetchedCourse.map((course: any, index) => (
             <div className="col-md-4 mt-3" key={index}>
               <div className="card mt-3">
-                <div className="card-header text-center">{course.title}</div>
-                <div className="card-body Description">
+                <div className="card-header text-center">{course.title}
+
+                  <Button
+                        variant="link"
+                        onClick={() => {
+                          handleArrowClick(course)
+                        }}
+                      >
+                        <BsPencil />
+                      </Button>
+
+                </div>
+
+                 <div className="card-body Description">
                   <p className="card-text">{course.description}</p>
                   <div className="float-end">
                     <button
                       className="arrow-button"
                       onClick={() => {
-                        handleArrowClick(course)
+                        navigator(`/ShowCourseDetails/${course._id}`)
                       }}
                     >
                       &rarr;
                     </button>
+
                   </div>
+
                 </div>
               </div>
             </div>
           ))}
         </div>
       </div>
-    
+
       <div className={`sidebar ${showDetails ? 'sidebar-open' : ''}`}>
           <div className="row mt-4 m-4">
             <div className="col-md-12">
@@ -206,7 +256,7 @@ const handleModal = ()=>{
                         className="btn btn-primary mt-3 adddbtn"
                         disabled={!formik.isValid}
                       >
-                        Add Courses
+                        {selectedCourse ? 'Update Courses' : 'Add Courses'}
                       </button>
                     </div>
                   </form>
@@ -218,9 +268,9 @@ const handleModal = ()=>{
           back
           </button>
         </div>
-      
+
     </>
   )
 }
 
-export default DashboardComponent;
+export default DashboardComponent

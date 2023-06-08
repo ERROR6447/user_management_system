@@ -9,6 +9,7 @@ import { type RootState } from '../../store/Store'
 import { addCourse } from '../../slice/CourseSlice'
 import { addCourses, getAllCourses } from '../../api/courses'
 import { useNavigate } from 'react-router-dom'
+import { getAllSubmission2 } from '../../api/submission'
 
 export interface Course {
   title: string
@@ -88,6 +89,11 @@ const DashboardComponent: React.FC = () => {
         console.log('Error While Fetching Course: ', resp)
         return
       }
+
+      const resp2: any = await getAllSubmission2()
+
+      console.log('Test resp2: ', resp2.data)
+
       console.log('Courses:', resp.data.courses)
       setFetchedCourse(resp.data.courses)
     } catch (err) {

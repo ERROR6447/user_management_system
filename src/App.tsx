@@ -44,6 +44,8 @@ function App () {
             {isUserUpdateVisible && <UserDetailsComponent />}
             {isCourseVisible && <StudentCourseComponent />}{' '} */}
         <Routes>
+          <Route path="/email-verified" element={<EmailVerificationSuccess />} />
+
           <Route path='/login' element={<Login />} />
           <Route path='/' element={<SharedLayout/>} >
             <Route path='/AdminDashboard' Component={DashboardComponent} />

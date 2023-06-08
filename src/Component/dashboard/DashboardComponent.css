@@ -10,6 +10,21 @@
 .row {
   margin-top: 1rem;
 }
+.sidebar {
+  position: fixed;
+  top: 0;
+  right: -400px; /* Initially off-screen */
+  height: 100%;
+  width: 28rem;
+  background-color: #fff;
+  transition: right 0.3s ease-in-out;
+  z-index: 9999;
+  background-color:aliceblue;
+}
+
+.sidebar-open {
+  right: 0; /* Moves the sidebar into the visible area */
+}
 
 .card {
   border: 1px solid #ccc;
@@ -48,7 +63,12 @@
 .card-text {
   margin: 0;
 }
-
+@media(max-width:500px) {
+  .sidebar{
+    width: 20rem;
+  }
+  
+}
 /* <div className="row">
 <div className="col-xl-3 col-sm-6 mb-3">
   <div className="card text-white bg-primary o-hidden h-100">

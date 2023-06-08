@@ -13,11 +13,11 @@
 .sidebar {
   position: fixed;
   top: 0;
-  right: -400px; /* Initially off-screen */
+  right: -500px; 
   height: 100%;
-  width: 28rem;
+  width: 30rem;
   background-color: #fff;
-  transition: right 0.3s ease-in-out;
+  transition: all 1.5s ease-in;
   z-index: 9999;
   background-color:aliceblue;
 }

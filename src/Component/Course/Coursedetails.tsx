@@ -57,7 +57,12 @@ const Coursedetails: React.FC = () => {
     }
   };
   const toggleSidebar = () => {
-    setShowDetails(true);
+    if(!showDetails){
+      setShowDetails(true)
+    }
+    else{
+      setShowDetails(false)
+    }
   };
   const fetchChapterForCourses = async (courseId: any) => {
     try {
@@ -252,8 +257,8 @@ const Coursedetails: React.FC = () => {
           </div>
         </div>
       </div>
-      {showDetails && (
-        <div className="sidebar sidebar-open">
+     
+        <div className={`sidebar-course ${showDetails ? 'sidebar-open' : ''}`}>
           <div className="card m-4">
           <div className="title-card">
            <h5 className="m-3">Manage Chapters</h5>
@@ -314,7 +319,7 @@ const Coursedetails: React.FC = () => {
           </button>
           </div>
         </div>
-      )}
+     
     </>
   );
 };

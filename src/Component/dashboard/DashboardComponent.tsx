@@ -161,8 +161,8 @@ const handleModal = ()=>{
           ))}
         </div>
       </div>
-      {showDetails && (
-        <div className="sidebar sidebar-open">
+    
+      <div className={`sidebar ${showDetails ? 'sidebar-open' : ''}`}>
           <div className="row mt-4 m-4">
             <div className="col-md-12">
               <div className="card">
@@ -212,7 +212,7 @@ const handleModal = ()=>{
           back
           </button>
         </div>
-      )}
+      
     </>
   )
 }

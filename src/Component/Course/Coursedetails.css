@@ -16,17 +16,17 @@
   max-height: 300px;
   object-fit: cover;
 }
-.sidebar {
-  position: fixed;
-  top: 0;
-  right: -400px; /* Initially off-screen */
-  height: 100%;
-  width: 40rem;
-  background-color: #fff;
-  transition: right 0.3s ease-in-out;
-  z-index: 9999;
-  background-color:aliceblue;
-}
+.sidebar-course {
+    position: fixed;
+    top: 0;
+    right: -650px; 
+    height: 100%;
+    width: 30rem;
+    background-color: #fff;
+    transition: all 1.5s ease-in;
+    z-index: 9999;
+    background-color:aliceblue;
+  }
 .title-card{
   width: 100%;
   height: 10%;
@@ -34,7 +34,7 @@
 background-color: #a5d5fd;
 }
 .sidebar-open {
-  right: 0; /* Moves the sidebar into the visible area */
+  right: 0; 
 }
 .form-group input,
 .form-group textarea {

@@ -50,3 +50,11 @@ export const getAllSubmission = async () => (
     console.log(err)
   })
 )
+
+export const getAllSubmission2 = async () => (
+  await axiosInstance('/getAllSubmission2', {
+    method: 'GET'
+  }).then((resp) => resp).catch((err) => {
+    console.log(err)
+  })
+)

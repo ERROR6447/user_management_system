@@ -165,14 +165,19 @@ const Navbar = ({ isAdmin, children }: any) => {
       <i className="fa fa-users" aria-hidden="true"></i>
       <span>Manage Students</span>
     </Link>
-    <div
+    <Link
       className="nav__item"
       role="button"
-      onClick={showUserUpdate}
+      // onClick={showUserUpdate}
+      to="/gradeStudent"
+      style={{
+        textDecoration: 'none',
+        color: 'white'
+      }}
     >
       <i className="fa fa-user" aria-hidden="true"></i>
       <span>Student Update</span>
-    </div>
+    </Link>
   </>
               )}
 

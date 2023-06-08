@@ -12,7 +12,7 @@ import EmailVerificationSuccess from './pages/auth/verify_email/EmailVerifyPage'
 import SharedLayout from './pages/sharedLayout/SharedLayout'
 import DashboardComponent from './Component/dashboard/DashboardComponent'
 import UserComponent from './Component/UserDetails/UserComponent'
-import CourseDetails from './Component/Student/Courses'
+import CourseProgress from './Component/Student/Courses'
 import Coursedetails from './Component/Course/Coursedetails'
 import UserDetailsComponent from './Component/UserDetails/UserDetailsComponent'
 import StudentCourse from './Component/Student/StudentCourse'
@@ -44,14 +44,17 @@ function App () {
             {isUserUpdateVisible && <UserDetailsComponent />}
             {isCourseVisible && <StudentCourseComponent />}{' '} */}
         <Routes>
+          <Route path="/email-verified" element={<EmailVerificationSuccess />} />
+
           <Route path='/login' element={<Login />} />
           <Route path='/' element={<SharedLayout/>} >
             <Route path='/AdminDashboard' Component={DashboardComponent} />
             <Route path='/Studentdashboard' Component={StudentCourse} />
-            <Route path='/ShowCourseDetails' Component={Coursedetails} />
+            <Route path='/ShowCourseDetails/:courseId' Component={Coursedetails} />
             <Route path='/manageEnrollment' Component={UserComponent} />
             <Route path='/courses' Component={StudentCourse} />
-            <Route path='/courseProgress/:courseId' Component={CourseDetails} />
+            <Route path='/courseProgress/:courseId' Component={CourseProgress} />
+            <Route path='/gradeStudent' Component={UserDetailsComponent} />
           </Route>
         </Routes>
       </div>

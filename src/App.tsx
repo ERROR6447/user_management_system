@@ -48,7 +48,7 @@ function App () {
           <Route path='/' element={<SharedLayout/>} >
             <Route path='/AdminDashboard' Component={DashboardComponent} />
             <Route path='/Studentdashboard' Component={StudentCourse} />
-            <Route path='/ShowCourseDetails/:courseId' Component={Coursedetails} />
+            <Route path='/ShowCourseDetails' Component={Coursedetails} />
             <Route path='/manageEnrollment' Component={UserComponent} />
             <Route path='/courses' Component={StudentCourse} />
             <Route path='/courseProgress/:courseId' Component={CourseDetails} />

@@ -27,6 +27,9 @@ const Register: React.FC = () => {
       Enable_2FactAuth: false
     }
 
+    setName('')
+    setEmail('')
+    setPassword('')
     signUp(payload).then((response: any) => {
       // Handle successful signup
       if (response.status !== 200) {

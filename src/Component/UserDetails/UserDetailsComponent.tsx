@@ -8,10 +8,10 @@ interface User {
   id: number
   name: string
   stack: string
-  courses: string[]
+  courses: []
   tasksCompleted: number
   totalTasks: number
-  submittedPracticals: string[]
+  submittedPracticals: []
   selectedCourse?: string
   grade?: number
   isSubmitted?: boolean
@@ -21,37 +21,38 @@ const UserDetailsComponent = () => {
   const [selectedStack, setSelectedStack] = useState('All')
   const [selectedCourse, setSelectedCourse] = useState('All')
   const [gradedUsers, setGradedUsers] = useState<number[]>([])
+  const [stacks, setStacks] = useState([])
 
   const [showGradeInput, setShowGradeInput] = useState(false)
 
-  const [users, setUsers] = useState<User[]>([
-    {
-      id: 1,
-      name: 'John Doe',
-      stack: 'Stack A',
-      courses: ['Course A', 'Course B'],
-      tasksCompleted: 7,
-      totalTasks: 10,
-      submittedPracticals: ['Course A', 'Course B']
-    },
-    {
-      id: 2,
-      name: 'Jane Smith',
-      stack: 'Stack A',
-      courses: ['Course B', 'Course C'],
-      tasksCompleted: 5,
-      totalTasks: 10,
-      submittedPracticals: ['Course C']
-    },
-    {
-      id: 3,
-      name: 'Mike Johnson',
-      stack: 'Stack B',
-      courses: ['Course A', 'Course C'],
-      tasksCompleted: 3,
-      totalTasks: 10,
-      submittedPracticals: ['Course A', 'Course C']
-    }
+  const [users, setUsers] = useState<any[]>([
+    // {
+    //   id: 1,
+    //   name: 'John Doe',
+    //   stack: 'Stack A',
+    //   courses: ['Course A', 'Course B'],
+    //   tasksCompleted: 7,
+    //   totalTasks: 10,
+    //   submittedPracticals: ['Course A', 'Course B']
+    // },
+    // {
+    //   id: 2,
+    //   name: 'Jane Smith',
+    //   stack: 'Stack A',
+    //   courses: ['Course B', 'Course C'],
+    //   tasksCompleted: 5,
+    //   totalTasks: 10,
+    //   submittedPracticals: ['Course C']
+    // },
+    // {
+    //   id: 3,
+    //   name: 'Mike Johnson',
+    //   stack: 'Stack B',
+    //   courses: ['Course A', 'Course C'],
+    //   tasksCompleted: 3,
+    //   totalTasks: 10,
+    //   submittedPracticals: ['Course A', 'Course C']
+    // }
   ])
 
   const handleStackChange = (event: React.ChangeEvent<{ value: string }>) => {
@@ -90,6 +91,9 @@ const UserDetailsComponent = () => {
       }
 
       console.log('Submission Fetched: ', resp.data)
+
+      setUsers(resp.data.allsubmission)
+      setStacks(resp.data.stacks)
     }).catch(err => {
       console.log('Error While Fetching Submissions: ', err)
     })
@@ -157,8 +161,9 @@ const UserDetailsComponent = () => {
             onChange={handleStackChange}
           >
             <option value="All">All</option>
-            <option value="Stack A">Stack A</option>
-            <option value="Stack B">Stack B</option>
+            {/* <option value="Stack A">Stack A</option>
+            <option value="Stack B">Stack B</option> */}
+            {stacks.map((stack) => (<option key={stack} value={stack}>{stack}</option>))}
           </Form.Control>
         </Form.Group>
         <Form.Group controlId="courseSelect">
@@ -175,10 +180,11 @@ const UserDetailsComponent = () => {
               .flatMap((user) => user.courses)
               .filter((course, index, self) => self.indexOf(course) === index)
               .map((course) => (
-                <option key={course} value={course}>
-                  {course}
+                <option key={course._id} value={course.title}>
+                  {course.title}
                 </option>
               ))}
+
           </Form.Control>
         </Form.Group>
       </Form>
@@ -212,13 +218,13 @@ const UserDetailsComponent = () => {
                       }}
                     >
                       <option value="All">All</option>
-                      {user.courses.map((course) => (
+                      {user.courses.map((course: any) => (
                         <option
-                          key={course}
-                          value={course}
+                          key={course._id}
+                          value={course._id}
                           className="courseTable"
                         >
-                          {course}
+                          {course.title}
                         </option>
                       ))}
                     </Form.Control>
@@ -227,9 +233,10 @@ const UserDetailsComponent = () => {
                     <span
                       style={{
                         marginRight: '5px',
-                        color: user.submittedPracticals.includes(user.selectedCourse ?? selectedCourse)
-                          ? 'green'
-                          : 'grey'
+                        //color: //user.submittedPracticals.map((prac)=>prac.chapter._id=)
+                        color: 
+                           'green'
+                          //: 'grey'
                       }}
                     >
                       {user.submittedPracticals.includes(user.selectedCourse ?? selectedCourse)

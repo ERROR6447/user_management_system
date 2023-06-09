@@ -34,9 +34,10 @@ const DashboardComponent: React.FC = () => {
   const courses = useSelector((state: RootState) => state.course.courses)
 
   const [fetchedCourse, setFetchedCourse] = useState([])
-  const studentData = [{ label: 'Total Students', data: 100 }]
-
-  const courseData = [{ label: 'Total Courses', data: 20 }]
+  const [studentData, setStudentData] = useState([{ label: 'Total Students', data: 100 }])
+  // const studentData = [{ label: 'Total Students', data: 100 }]
+  const [courseData, setCourseData] = useState([{ label: 'Total Courses', data: 20 }])
+  // const courseData = [{ label: 'Total Courses', data: 20 }]
   const navigator = useNavigate()
   const [showDetails, setShowDetails] = useState(false)
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null)
@@ -127,6 +128,8 @@ const DashboardComponent: React.FC = () => {
 
       console.log('Courses:', resp.data.courses)
       setFetchedCourse(resp.data.courses)
+      setStudentData([{ label: 'Total Students', data: resp.data.totalStudents }])
+      setCourseData([{ label: 'Total Courses', data: resp.data.courses.length }])
     } catch (err) {
       console.log('Error While Fetching Course: ', err)
     }

@@ -6,6 +6,7 @@ import './Student.css'
 import { useParams } from 'react-router-dom'
 import { getCourseProgress } from '../../api/courses'
 import { submitChapter } from '../../api/submission'
+import { toast } from 'react-hot-toast'
 
 interface Chapter {
   id: number
@@ -69,6 +70,7 @@ const CourseProgress: React.FC = () => {
         console.log('Error While Submitting Practical: ', resp)
         return
       }
+      toast.success(resp.data.message)
       console.log('Practical Sumbitted Succesffully', resp)
     }).catch(err => {
       console.log('Error While Submitting Practical: ', err)

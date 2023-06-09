@@ -10,6 +10,7 @@ import { type RootState } from '../../store/Store' // Replace 'path/to/redux/sto
 import './User.css'
 import { getAllCourses, enrollmultiplecourses, removeEnrollment } from '../../api/courses'
 import { getAllUsers } from '../../api/users'
+import { toast } from 'react-hot-toast'
 
 interface Student {
   id: number
@@ -119,6 +120,7 @@ const UserComponent: React.FC = () => {
         return
       }
       // setCourses(resp.data.courses)
+      toast.success(resp.data.message)
       console.log('All Students Added Result:', resp.data.users)
       // setStudents(resp.data.users)
     }).catch(err => {
@@ -174,7 +176,7 @@ const UserComponent: React.FC = () => {
       }
 
       // setCourses(resp.data.courses)
-
+      toast.success(resp.data.message)
       console.log('Student Enrollment Deleted:', resp.data)
       fetchAllUsers()
       // setStudents(resp.data.users)

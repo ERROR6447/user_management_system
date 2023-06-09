@@ -15,6 +15,7 @@ import {
   updateChapters
 } from '../../api/chapter'
 import { getCourseById } from '../../api/courses'
+import { toast } from 'react-hot-toast'
 
 interface SubCategory {
   _id: string
@@ -50,9 +51,9 @@ const Coursedetails: React.FC = () => {
 
       console.log('Course:', resp.data.course)
       setCourse(resp.data.course)
-      fetchChapterForCourses(resp.data.course._id).catch((err) => [
+      fetchChapterForCourses(resp.data.course._id).catch((err) => {
         console.log('Error WHile Fetching Chapters: ', err)
-      ])
+      })
     } catch (err) {
       console.log('Error While Fetching Course Details: ', err)
     }
@@ -84,9 +85,9 @@ const Coursedetails: React.FC = () => {
     }
 
     if (course._id) {
-      fetchChapterForCourses(course._id).catch((err) => [
+      fetchChapterForCourses(course._id).catch((err) => {
         console.log('Error WHile Fetching Chapters: ', err)
-      ])
+      })
     }
   }, [])
 
@@ -131,9 +132,10 @@ const Coursedetails: React.FC = () => {
             return
           }
           toggleSidebar()
-          fetchChapterForCourses(course._id).catch((err) => [
+          toast.success(resp.data.message)
+          fetchChapterForCourses(course._id).catch((err) => {
             console.log('Error WHile Fetching Chapters: ', err)
-          ])
+          })
           console.log('Chapter updated For Course:', resp)
         })
         .catch((err) => {
@@ -156,9 +158,11 @@ const Coursedetails: React.FC = () => {
             return
           }
           toggleSidebar()
-          fetchChapterForCourses(course._id).catch((err) => [
+          toast.success(resp.data.message)
+
+          fetchChapterForCourses(course._id).catch((err) => {
             console.log('Error WHile Fetching Chapters: ', err)
-          ])
+          })
           console.log('Chapter Added For Course:', resp)
         })
         .catch((err) => {
@@ -175,9 +179,9 @@ const Coursedetails: React.FC = () => {
       fileInputRef.current.value = ''
     }
 
-    fetchChapterForCourses(course._id).catch((err) => [
+    fetchChapterForCourses(course._id).catch((err) => {
       console.log('Error WHile Fetching Chapters: ', err)
-    ])
+    })
   }
 
   const handleEdit = (index: number, cchapterId: string) => {
@@ -200,9 +204,10 @@ const Coursedetails: React.FC = () => {
           console.log('Error While deleting Chapter:', resp)
           return
         }
-        fetchChapterForCourses(course._id).catch((err) => [
+        toast.success(resp.data.message)
+        fetchChapterForCourses(course._id).catch((err) => {
           console.log('Error WHile Fetching Chapters: ', err)
-        ])
+        })
         console.log('Chapter deleted For Course:', resp)
       })
       .catch((err) => {
@@ -211,9 +216,9 @@ const Coursedetails: React.FC = () => {
 
     setEditIndex(null)
 
-    fetchChapterForCourses(course._id).catch((err) => [
+    fetchChapterForCourses(course._id).catch((err) => {
       console.log('Error WHile Fetching Chapters: ', err)
-    ])
+    })
   }
 
   return (
@@ -336,7 +341,7 @@ const Coursedetails: React.FC = () => {
             </div>
 
             <button type="submit" className="btn btn-primary mt-3">
-              Add Chapter
+             Add Chapter
             </button>
           </form>
           <button className="ms-3 w-25" onClick={handleModal}>
